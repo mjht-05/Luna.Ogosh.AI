@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Ogosh",
+  "version": "1.3.0",
+  "description": "Auto-translate WhatsApp Web. AI Hinglish + Emotion Pulse via OpenAI (optional, essentially free).",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://web.whatsapp.com/*",
+    "https://translate.googleapis.com/*",
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [{
+    "matches": ["https://web.whatsapp.com/*"],
+    "js": ["content.js"],
+    "css": ["styles.css"],
+    "run_at": "document_idle"
+  }],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Ogosh Settings"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

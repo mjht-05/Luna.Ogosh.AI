@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Ogosh</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      width: 310px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #111b21;
+      color: #d1d7db;
+      -webkit-font-smoothing: antialiased
+    }
+
+    .header {
+      background: #00a884;
+      padding: 16px
+    }
+
+    .header h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -.01em
+    }
+
+    .header p {
+      font-size: 11px;
+      color: rgba(255, 255, 255, .72);
+      margin-top: 2px
+    }
+
+    .section {
+      padding: 13px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, .05)
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #8696a0;
+      margin-bottom: 10px
+    }
+
+    /* Language options */
+    .lang-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px
+    }
+
+    .lang-opt {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 12px;
+      background: rgba(255, 255, 255, .04);
+      border: 1.5px solid rgba(255, 255, 255, .08);
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #aebac1;
+      user-select: none;
+      transition: border-color .15s, background .15s, color .15s
+    }
+
+    .lang-opt:hover {
+      background: rgba(255, 255, 255, .07);
+      color: #d1d7db
+    }
+
+    .lang-opt.active {
+      border-color: #00a884;
+      background: rgba(0, 168, 132, .12);
+      color: #00a884;
+      font-weight: 600
+    }
+
+    .lang-opt input[type=radio] {
+      display: none
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .15);
+      flex-shrink: 0;
+      transition: background .15s
+    }
+
+    .lang-opt.active .dot {
+      background: #00a884
+    }
+
+    .flag {
+      font-size: 15px;
+      flex-shrink: 0
+    }
+
+    /* API key */
+    .key-row {
+      position: relative;
+      display: flex;
+      align-items: center
+    }
+
+    .key-row input {
+      width: 100%;
+      padding: 9px 34px 9px 11px;
+      background: rgba(255, 255, 255, .06);
+      border: 1.5px solid rgba(255, 255, 255, .1);
+      border-radius: 8px;
+      color: #d1d7db;
+      font-size: 12px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      outline: none;
+      transition: border-color .18s
+    }
+
+    .key-row input::placeholder {
+      color: #3d4f57;
+      font-family: inherit
+    }
+
+    .key-row input:focus {
+      border-color: #00a884
+    }
+
+    .eye-btn {
+      position: absolute;
+      right: 9px;
+      background: none;
+      border: none;
+      color: #8696a0;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px;
+      line-height: 1;
+      transition: color .15s
+    }
+
+    .eye-btn:hover {
+      color: #d1d7db
+    }
+
+    .hint {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #5c6b73;
+      line-height: 1.45
+    }
+
+    .hint a {
+      color: #00a884;
+      text-decoration: none
+    }
+
+    .hint a:hover {
+      text-decoration: underline
+    }
+
+    /* Tracked contacts */
+    .tracked-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 20px
+    }
+
+    .tracked-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 11px;
+      background: rgba(0, 168, 132, .08);
+      border: 1px solid rgba(0, 168, 132, .25);
+      border-radius: 8px
+    }
+
+    .tracked-name {
+      font-size: 13px;
+      color: #d1d7db;
+      font-weight: 500
+    }
+
+    .tracked-remove {
+      background: none;
+      border: none;
+      color: #8696a0;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color .15s, background .15s
+    }
+
+    .tracked-remove:hover {
+      color: #f87171;
+      background: rgba(248, 113, 113, .1)
+    }
+
+    .tracked-empty {
+      font-size: 12px;
+      color: #3d4f57;
+      font-style: italic;
+      padding: 4px 0
+    }
+
+    .tracked-slots {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px
+    }
+
+    .tracked-slot {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, .08)
+    }
+
+    .tracked-slot.used {
+      background: #00a884
+    }
+
+    /* Save */
+    .save-btn {
+      display: block;
+      width: calc(100% - 32px);
+      margin: 0 16px 4px;
+      padding: 10px;
+      background: #00a884;
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s
+    }
+
+    .save-btn:hover {
+      background: #009c79
+    }
+
+    .save-btn:active {
+      background: #008e6e
+    }
+
+    .status {
+      text-align: center;
+      font-size: 11.5px;
+      color: #00a884;
+      padding: 7px 16px 10px;
+      min-height: 28px;
+      opacity: 0;
+      transition: opacity .2s
+    }
+
+    .status.show {
+      opacity: 1
+    }
+
+    .status.err {
+      color: #f87171
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 10px;
+      color: #3d4f57;
+      padding-bottom: 12px
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h1>Ogosh</h1>
+    <p>Auto-translate · Emotion Pulse · Free</p>
+  </div>
+
+  <!-- Language -->
+  <div class="section">
+    <div class="section-label">Translate messages into</div>
+    <div class="lang-grid" id="langGrid">
+      <label class="lang-opt" data-lang="english">
+        <input type="radio" name="lang" value="english">
+        <div class="dot"></div><span class="flag">🇬🇧</span> English
+      </label>
+      <label class="lang-opt" data-lang="hindi">
+        <input type="radio" name="lang" value="hindi">
+        <div class="dot"></div><span class="flag">🇮🇳</span> हिंदी &nbsp;Hindi
+      </label>
+      <label class="lang-opt" data-lang="hinglish">
+        <input type="radio" name="lang" value="hinglish">
+        <div class="dot"></div><span class="flag">🇮🇳</span> Hinglish <span
+          style="font-size:10px;color:#8696a0;margin-left:4px">AI ✦</span>
+      </label>
+      <label class="lang-opt" data-lang="french">
+        <input type="radio" name="lang" value="french">
+        <div class="dot"></div><span class="flag">🇫🇷</span> Français &nbsp;French
+      </label>
+      <label class="lang-opt" data-lang="portuguese">
+        <input type="radio" name="lang" value="portuguese">
+        <div class="dot"></div><span class="flag">🇧🇷</span> Português
+      </label>
+    </div>
+  </div>
+
+  <!-- OpenAI key -->
+  <div class="section">
+    <div class="section-label">Gemini API Key &nbsp;<span
+        style="font-size:9px;color:#8696a0;font-weight:400;text-transform:none">Optional — for Hinglish AI + Emotion
+        Pulse</span></div>
+    <div class="key-row">
+      <input type="password" id="apiKey" autocomplete="off" spellcheck="false">
+      <button class="eye-btn" id="eyeBtn">👁</button>
+    </div>
+    <p class="hint">Free credits at <a href="https://aistudio.google.com/app/apikey"
+        target="_blank">aistudio.google.com</a>. Uses gemini-1.5-flash — fractions of a cent per message.</p>
+  </div>
+
+  <!-- Tracked contacts -->
+  <div class="section">
+    <div class="section-label">Tracked Contacts</div>
+    <div class="tracked-list" id="trackedList">
+      <span class="tracked-empty">No contacts tracked yet.</span>
+    </div>
+    <div class="tracked-slots" id="trackedSlots">
+      <div class="tracked-slot" id="slot0"></div>
+      <div class="tracked-slot" id="slot1"></div>
+      <div class="tracked-slot" id="slot2"></div>
+    </div>
+    <p class="hint" style="margin-top:7px">Open a chat and tap 🧠 to track (max 3). Messages stay on your device only.
+    </p>
+  </div>
+
+  <button class="save-btn" id="saveBtn">Save</button>
+  <div class="status" id="status"></div>
+  <div class="footer-note">Google Translate · Gemini Flash (latest) · Completely free tier</div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>

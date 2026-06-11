@@ -1,0 +1,146 @@
+/* Ogosh v1.3 — injected into WhatsApp Web */
+
+/* ── Translation panel ──────────────────────────────────────────────────────── */
+.ogosh-panel {
+  padding: 6px 10px 8px;
+  background: rgba(0,168,132,0.07);
+  border-left: 2.5px solid #00a884;
+  border-radius: 0 7px 7px 0;
+  margin: 2px 0 4px;
+  max-width: min(360px, 92vw);
+  animation: ogoshIn 0.18s ease;
+}
+.ogosh-loading { border-left-color: rgba(134,150,160,0.35); }
+.ogosh-dots { font-size: 11px; color: #8696a0; animation: ogoshPulse 1.4s ease-in-out infinite; }
+.ogosh-meta { display:flex; align-items:center; gap:4px; margin-bottom:4px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+.ogosh-from  { color: #8696a0; }
+.ogosh-arrow { color: #8696a0; font-weight: 400; }
+.ogosh-to    { color: #00a884; }
+.ogosh-text  { font-size: 13.5px; line-height: 1.55; color: #e9edef; word-break: break-word; white-space: pre-wrap; }
+.ogosh-error { border-left-color: #f87171; }
+.ogosh-err   { font-size: 11.5px; color: #f87171; }
+
+/* ── Toggle button (in WhatsApp header) ─────────────────────────────────────── */
+.ogosh-toggle-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 6px;
+  border-radius: 50%;
+  opacity: 0.55;
+  transition: opacity .15s, background .15s;
+  line-height: 1;
+  vertical-align: middle;
+}
+.ogosh-toggle-btn:hover     { opacity: 1; background: rgba(255,255,255,0.08); }
+.ogosh-toggle-active        { opacity: 1 !important; background: rgba(0,168,132,0.18) !important; }
+
+/* ── Toast notification ─────────────────────────────────────────────────────── */
+.ogosh-toast {
+  position: fixed;
+  top: 68px;
+  right: 12px;
+  z-index: 10001;
+  background: #2a3942;
+  color: #d1d7db;
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: 9px 14px;
+  border-radius: 9px;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+  max-width: 260px;
+  line-height: 1.45;
+  transition: opacity .3s;
+}
+.ogosh-toast-hide { opacity: 0; }
+
+/* ── Consent modal ──────────────────────────────────────────────────────────── */
+.ogosh-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ogoshFade .15s ease;
+}
+.ogosh-consent {
+  background: #1f2c34;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 26px 24px 22px;
+  width: 300px;
+  max-width: 90vw;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #d1d7db;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.ogosh-consent-icon  { font-size: 32px; margin-bottom: 10px; }
+.ogosh-consent-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.ogosh-consent-name  { font-size: 13px; font-weight: 600; color: #00a884; margin-bottom: 14px; padding: 5px 12px; background: rgba(0,168,132,0.12); border-radius: 20px; display: inline-block; }
+.ogosh-consent-body  { font-size: 12.5px; line-height: 1.5; color: #aebac1; margin-bottom: 8px; }
+.ogosh-consent-body strong { color: #e9edef; }
+.ogosh-consent-sub   { font-size: 11px; color: #8696a0; margin-bottom: 20px; line-height: 1.4; }
+.ogosh-consent-btns  { display: flex; gap: 10px; }
+.ogosh-btn-decline {
+  flex: 1; padding: 9px; background: rgba(255,255,255,0.06); color: #aebac1;
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; font-size: 13px;
+  cursor: pointer; transition: background .15s;
+}
+.ogosh-btn-decline:hover { background: rgba(255,255,255,0.1); }
+.ogosh-btn-allow {
+  flex: 1; padding: 9px; background: #00a884; color: #fff;
+  border: none; border-radius: 9px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: background .15s;
+}
+.ogosh-btn-allow:hover { background: #009c79; }
+
+/* ── Emotion Pulse panel ────────────────────────────────────────────────────── */
+.ogosh-ep {
+  position: fixed;
+  top: 62px;
+  right: 8px;
+  width: 256px;
+  background: #1f2c34;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.45);
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow: hidden;
+  animation: ogoshSlide .2s ease;
+}
+.ogosh-ep-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 12px 8px;
+  background: rgba(0,168,132,0.11);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.ogosh-ep-title { font-size: 12px; font-weight: 700; color: #00a884; }
+.ogosh-ep-min   { background: none; border: none; color: #8696a0; cursor: pointer; font-size: 16px; line-height: 1; padding: 0 2px; transition: color .15s; }
+.ogosh-ep-min:hover { color: #d1d7db; }
+.ogosh-ep-body  { padding: 10px 12px 12px; }
+.ogosh-ep-spin  { font-size: 12px; color: #8696a0; text-align: center; padding: 8px 0; animation: ogoshPulse 1.4s ease-in-out infinite; }
+.ogosh-ep-err   { font-size: 11.5px; color: #f87171; }
+.ogosh-ect      { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #8696a0; margin-bottom: 9px; }
+.ogosh-erow     { display: flex; align-items: center; gap: 5px; margin-bottom: 6px; }
+.ogosh-ename    { font-size: 11.5px; font-weight: 600; width: 88px; flex-shrink: 0; }
+.ogosh-dots-row { display: flex; gap: 3px; flex: 1; }
+.ogosh-dot      { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.1); transition: background .2s; }
+.ogosh-eint     { font-size: 10px; color: #8696a0; width: 24px; text-align: right; flex-shrink: 0; }
+.ogosh-insight  { margin-top: 9px; font-size: 11.5px; color: #d1d7db; font-style: italic; line-height: 1.45; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px; }
+.ogosh-emoji-note { margin-top: 5px; font-size: 11px; color: #8696a0; line-height: 1.4; }
+
+/* ── Light theme ────────────────────────────────────────────────────────────── */
+[data-theme="light"] .ogosh-text  { color: #111b21; }
+[data-theme="light"] .ogosh-panel { background: rgba(0,168,132,0.05); }
+
+/* ── Animations ─────────────────────────────────────────────────────────────── */
+@keyframes ogoshIn    { from { opacity:0; transform:translateY(-2px); } to { opacity:1; transform:none; } }
+@keyframes ogoshSlide { from { opacity:0; transform:translateY(-8px) scale(.97); } to { opacity:1; transform:none; } }
+@keyframes ogoshFade  { from { opacity:0; } to { opacity:1; } }
+@keyframes ogoshPulse { 0%,100% { opacity:.3; } 50% { opacity:.9; } }
