@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Ogosh",
-  "version": "1.3.0",
-  "description": "Auto-translate WhatsApp Web. AI Hinglish + Emotion Pulse via OpenAI (optional, essentially free).",
+  "version": "1.0.0",
+  "description": "Auto-translate WhatsApp Web. Fast Hinglish transliteration, 130+ languages, and AI Emotion Pulse via Groq & Gemini.",
   "permissions": ["storage"],
   "host_permissions": [
     "https://web.whatsapp.com/*",

@@ -287,17 +287,21 @@
     /* Select Dropdowns */
     .ogosh-select {
       width: 100%;
-      padding: 8px 10px;
-      background: rgba(255, 255, 255, .06);
-      border: 1.5px solid rgba(255, 255, 255, .1);
-      border-radius: 8px;
+      background: #2a3942;
+      border: 1px solid rgba(255,255,255,0.1);
       color: #d1d7db;
+      border-radius: 8px;
+      padding: 8px 12px;
       font-size: 13px;
-      outline: none;
-      transition: border-color .18s;
       appearance: none;
-      -webkit-appearance: none;
+      outline: none;
       cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .ogosh-select option {
+      background: #1f2c34;
+      color: #e9edef;
+      padding: 8px;
     }
 
     .ogosh-select:focus {
@@ -370,8 +374,7 @@
       content: attr(data-tooltip);
       position: absolute;
       bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
+      right: 0;
       margin-bottom: 6px;
       padding: 6px 8px;
       background: #2a3942;
@@ -385,6 +388,7 @@
       z-index: 10;
       text-transform: none;
       letter-spacing: normal;
+      text-align: left;
     }
   </style>
 </head>
@@ -404,17 +408,10 @@
     </div>
     <div class="tags-container" id="sourceLangTags"></div>
     <div class="select-wrapper">
-      <select class="ogosh-select" id="sourceLangSelect">
-        <option value="" disabled selected>Add a language... (Max 5)</option>
-        <option value="hindi">Hindi</option>
-        <option value="hinglish">Hinglish (HiEn)</option>
-        <option value="english">English</option>
-        <option value="french">French</option>
-        <option value="spanish">Spanish</option>
-        <option value="portuguese">Portuguese</option>
-        <option value="marathi">Marathi</option>
-        <option value="tamil">Tamil</option>
-      </select>
+      <input list="sourceLangsData" class="ogosh-select" id="sourceLangInput" placeholder="Type to search & add... (Max 5)">
+      <datalist id="sourceLangsData">
+        <!-- Populated by JS -->
+      </datalist>
     </div>
   </div>
 
@@ -425,17 +422,10 @@
       <!-- Top 2 will be populated by JS -->
     </div>
     <div class="select-wrapper">
-      <select class="ogosh-select" id="targetLangSelect">
-        <option value="" disabled selected>More languages...</option>
-        <option value="hindi">Hindi</option>
-        <option value="hinglish">Hinglish (HiEn)</option>
-        <option value="english">English</option>
-        <option value="french">French</option>
-        <option value="spanish">Spanish</option>
-        <option value="portuguese">Portuguese</option>
-        <option value="marathi">Marathi</option>
-        <option value="tamil">Tamil</option>
-      </select>
+      <input list="targetLangsData" class="ogosh-select" id="targetLangInput" placeholder="Type to search & select target...">
+      <datalist id="targetLangsData">
+        <!-- Populated by JS -->
+      </datalist>
     </div>
   </div>
 

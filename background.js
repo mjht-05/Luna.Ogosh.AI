@@ -4,23 +4,147 @@
 
 importScripts('hinlang.js');
 
-const LANG_CONFIG = {
-  english:    { label: 'English',   code: 'en' },
-  hindi:      { label: 'Hindi',     code: 'hi' },
-  hinglish:   { label: 'Hinglish',  code: 'hi-Latn' },
-  french:     { label: 'French',    code: 'fr' },
-  spanish:    { label: 'Spanish',   code: 'es' },
-  portuguese: { label: 'Português', code: 'pt' },
-  marathi:    { label: 'Marathi',   code: 'mr' },
-  tamil:      { label: 'Tamil',     code: 'ta' }
+const ALL_LANGS = {
+  afrikaans: { label: 'Afrikaans', code: 'af' },
+  albanian: { label: 'Albanian', code: 'sq' },
+  amharic: { label: 'Amharic', code: 'am' },
+  arabic: { label: 'Arabic', code: 'ar' },
+  armenian: { label: 'Armenian', code: 'hy' },
+  assamese: { label: 'Assamese', code: 'as' },
+  aymara: { label: 'Aymara', code: 'ay' },
+  azerbaijani: { label: 'Azerbaijani', code: 'az' },
+  bambara: { label: 'Bambara', code: 'bm' },
+  basque: { label: 'Basque', code: 'eu' },
+  belarusian: { label: 'Belarusian', code: 'be' },
+  bengali: { label: 'Bengali', code: 'bn' },
+  bhojpuri: { label: 'Bhojpuri', code: 'bho' },
+  bosnian: { label: 'Bosnian', code: 'bs' },
+  bulgarian: { label: 'Bulgarian', code: 'bg' },
+  catalan: { label: 'Catalan', code: 'ca' },
+  cebuano: { label: 'Cebuano', code: 'ceb' },
+  chinese_simplified: { label: 'Chinese (Simplified)', code: 'zh-CN' },
+  chinese_traditional: { label: 'Chinese (Traditional)', code: 'zh-TW' },
+  corsican: { label: 'Corsican', code: 'co' },
+  croatian: { label: 'Croatian', code: 'hr' },
+  czech: { label: 'Czech', code: 'cs' },
+  danish: { label: 'Danish', code: 'da' },
+  dhivehi: { label: 'Dhivehi', code: 'dv' },
+  dogri: { label: 'Dogri', code: 'doi' },
+  dutch: { label: 'Dutch', code: 'nl' },
+  english: { label: 'English', code: 'en' },
+  esperanto: { label: 'Esperanto', code: 'eo' },
+  estonian: { label: 'Estonian', code: 'et' },
+  ewe: { label: 'Ewe', code: 'ee' },
+  filipino: { label: 'Filipino', code: 'tl' },
+  finnish: { label: 'Finnish', code: 'fi' },
+  french: { label: 'French', code: 'fr' },
+  frisian: { label: 'Frisian', code: 'fy' },
+  galician: { label: 'Galician', code: 'gl' },
+  georgian: { label: 'Georgian', code: 'ka' },
+  german: { label: 'German', code: 'de' },
+  greek: { label: 'Greek', code: 'el' },
+  guarani: { label: 'Guarani', code: 'gn' },
+  gujarati: { label: 'Gujarati', code: 'gu' },
+  haitian_creole: { label: 'Haitian Creole', code: 'ht' },
+  hausa: { label: 'Hausa', code: 'ha' },
+  hawaiian: { label: 'Hawaiian', code: 'haw' },
+  hebrew: { label: 'Hebrew', code: 'he' },
+  hindi: { label: 'Hindi', code: 'hi' },
+  hmong: { label: 'Hmong', code: 'hmn' },
+  hungarian: { label: 'Hungarian', code: 'hu' },
+  icelandic: { label: 'Icelandic', code: 'is' },
+  igbo: { label: 'Igbo', code: 'ig' },
+  ilocano: { label: 'Ilocano', code: 'ilo' },
+  indonesian: { label: 'Indonesian', code: 'id' },
+  irish: { label: 'Irish', code: 'ga' },
+  italian: { label: 'Italian', code: 'it' },
+  japanese: { label: 'Japanese', code: 'ja' },
+  javanese: { label: 'Javanese', code: 'jv' },
+  kannada: { label: 'Kannada', code: 'kn' },
+  kazakh: { label: 'Kazakh', code: 'kk' },
+  khmer: { label: 'Khmer', code: 'km' },
+  kinyarwanda: { label: 'Kinyarwanda', code: 'rw' },
+  konkani: { label: 'Konkani', code: 'gom' },
+  korean: { label: 'Korean', code: 'ko' },
+  krio: { label: 'Krio', code: 'kri' },
+  kurdish_kurmanji: { label: 'Kurdish (Kurmanji)', code: 'ku' },
+  kurdish_sorani: { label: 'Kurdish (Sorani)', code: 'ckb' },
+  kyrgyz: { label: 'Kyrgyz', code: 'ky' },
+  lao: { label: 'Lao', code: 'lo' },
+  latin: { label: 'Latin', code: 'la' },
+  latvian: { label: 'Latvian', code: 'lv' },
+  lingala: { label: 'Lingala', code: 'ln' },
+  lithuanian: { label: 'Lithuanian', code: 'lt' },
+  luganda: { label: 'Luganda', code: 'lg' },
+  luxembourgish: { label: 'Luxembourgish', code: 'lb' },
+  macedonian: { label: 'Macedonian', code: 'mk' },
+  maithili: { label: 'Maithili', code: 'mai' },
+  malagasy: { label: 'Malagasy', code: 'mg' },
+  malay: { label: 'Malay', code: 'ms' },
+  malayalam: { label: 'Malayalam', code: 'ml' },
+  maltese: { label: 'Maltese', code: 'mt' },
+  maori: { label: 'Maori', code: 'mi' },
+  marathi: { label: 'Marathi', code: 'mr' },
+  meiteilon_manipuri: { label: 'Meiteilon (Manipuri)', code: 'mni-Mtei' },
+  mizo: { label: 'Mizo', code: 'lus' },
+  mongolian: { label: 'Mongolian', code: 'mn' },
+  myanmar_burmese: { label: 'Myanmar (Burmese)', code: 'my' },
+  nepali: { label: 'Nepali', code: 'ne' },
+  norwegian: { label: 'Norwegian', code: 'no' },
+  nyanja_chichewa: { label: 'Nyanja (Chichewa)', code: 'ny' },
+  odia_oriya: { label: 'Odia (Oriya)', code: 'or' },
+  oromo: { label: 'Oromo', code: 'om' },
+  pashto: { label: 'Pashto', code: 'ps' },
+  persian: { label: 'Persian', code: 'fa' },
+  polish: { label: 'Polish', code: 'pl' },
+  portuguese: { label: 'Portuguese', code: 'pt' },
+  punjabi: { label: 'Punjabi', code: 'pa' },
+  quechua: { label: 'Quechua', code: 'qu' },
+  romanian: { label: 'Romanian', code: 'ro' },
+  russian: { label: 'Russian', code: 'ru' },
+  samoan: { label: 'Samoan', code: 'sm' },
+  sanskrit: { label: 'Sanskrit', code: 'sa' },
+  scots_gaelic: { label: 'Scots Gaelic', code: 'gd' },
+  sepedi: { label: 'Sepedi', code: 'nso' },
+  serbian: { label: 'Serbian', code: 'sr' },
+  sesotho: { label: 'Sesotho', code: 'st' },
+  shona: { label: 'Shona', code: 'sn' },
+  sindhi: { label: 'Sindhi', code: 'sd' },
+  sinhala: { label: 'Sinhala', code: 'si' },
+  slovak: { label: 'Slovak', code: 'sk' },
+  slovenian: { label: 'Slovenian', code: 'sl' },
+  somali: { label: 'Somali', code: 'so' },
+  spanish: { label: 'Spanish', code: 'es' },
+  sundanese: { label: 'Sundanese', code: 'su' },
+  swahili: { label: 'Swahili', code: 'sw' },
+  swedish: { label: 'Swedish', code: 'sv' },
+  tajik: { label: 'Tajik', code: 'tg' },
+  tamil: { label: 'Tamil', code: 'ta' },
+  tatar: { label: 'Tatar', code: 'tt' },
+  telugu: { label: 'Telugu', code: 'te' },
+  thai: { label: 'Thai', code: 'th' },
+  tigrinya: { label: 'Tigrinya', code: 'ti' },
+  tsonga: { label: 'Tsonga', code: 'ts' },
+  turkish: { label: 'Turkish', code: 'tr' },
+  turkmen: { label: 'Turkmen', code: 'tk' },
+  twi_akan: { label: 'Twi (Akan)', code: 'ak' },
+  ukrainian: { label: 'Ukrainian', code: 'uk' },
+  urdu: { label: 'Urdu', code: 'ur' },
+  uyghur: { label: 'Uyghur', code: 'ug' },
+  uzbek: { label: 'Uzbek', code: 'uz' },
+  vietnamese: { label: 'Vietnamese', code: 'vi' },
+  welsh: { label: 'Welsh', code: 'cy' },
+  xhosa: { label: 'Xhosa', code: 'xh' },
+  yiddish: { label: 'Yiddish', code: 'yi' },
+  yoruba: { label: 'Yoruba', code: 'yo' },
+  zulu: { label: 'Zulu', code: 'zu' },
+  hinglish: { label: 'Hinglish (HiEn)', code: 'hien' }
 };
 
-const LANG_NAMES = {
-  en: 'English', hi: 'Hindi', fr: 'French', de: 'German',
-  es: 'Spanish', it: 'Italian', pt: 'Portuguese', ar: 'Arabic',
-  zh: 'Chinese', ja: 'Japanese', ko: 'Korean', ru: 'Russian',
-  mr: 'Marathi', ta: 'Tamil'
-};
+const LANG_CODE_TO_LABEL = {};
+for (const [key, val] of Object.entries(ALL_LANGS)) {
+  LANG_CODE_TO_LABEL[val.code] = val.label;
+}
 
 // ── Hinglish source detection ─────────────────────────────────────────────────
 // These words are distinctly Hindi in Latin script and won't appear in plain English/French/etc.
@@ -39,6 +163,37 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     translate(message.text).then(sendResponse).catch(err => sendResponse({ error: err.message }));
     return true;
   }
+  if (message.type === 'TRANSLATE_DRAFT') {
+    const langObj = ALL_LANGS[message.targetLang] || ALL_LANGS.english;
+    translateGoogle(message.text, { code: langObj.code, label: 'Draft' })
+      .then(res => {
+        let out = res.translation;
+        let detectedCode = res.detectedCode || '';
+        let detectedLabel = LANG_CODE_TO_LABEL[detectedCode] || detectedCode.toUpperCase() || 'AUTO';
+
+        let isHinglish = false;
+        if (typeof hinlang !== 'undefined') {
+          const script = hinlang.detect_script(message.text);
+          if (script === 'roman' || script === 'mixed') {
+            if (detectedCode === 'hi' || isLikelyHinglish(message.text)) {
+              isHinglish = true;
+            }
+          }
+        }
+
+        if (isHinglish) {
+          detectedLabel = 'HINGLISH';
+        }
+
+        if (langObj.code === 'hi' && isHinglish && typeof hinlang !== 'undefined') {
+            out = hinlang.to_hindi(message.text);
+        }
+        
+        sendResponse({ text: out, detected: detectedLabel });
+      })
+      .catch(err => sendResponse({ error: err.message }));
+    return true;
+  }
   if (message.type === 'ANALYZE_EMOTION') {
     analyzeEmotion(message.contact, message.messages, message.patterns)
       .then(sendResponse).catch(err => sendResponse({ error: err.message }));
@@ -52,14 +207,57 @@ async function translate(text) {
   const stored = await chrome.storage.sync.get(['wa_target_lang', 'wa_source_langs']);
   const targetLang = stored.wa_target_lang || 'english';
   const sourceLangs = stored.wa_source_langs || [];
-  const lang = LANG_CONFIG[targetLang] || LANG_CONFIG.english;
+  const lang = ALL_LANGS[targetLang] || ALL_LANGS.english;
 
-  // Convert Hinglish to Hindi before translation using hinlang.js
-  if (sourceLangs.includes('hinglish') && isLikelyHinglish(text) && typeof hinlang !== 'undefined') {
-    text = hinlang.to_hindi(text);
+  let originalIsHinglish = false;
+
+  // Convert ONLY strongly identified Hinglish to Hindi before translation
+  if (sourceLangs.includes('hinglish') && typeof hinlang !== 'undefined') {
+    if (isLikelyHinglish(text)) {
+      text = hinlang.to_hindi(text);
+      originalIsHinglish = true;
+    }
   }
 
-  return translateGoogle(text, lang);
+  const res = await translateGoogle(text, lang);
+  if (res.error) return res;
+
+  const detectedCode = res.detectedCode || '';
+
+  // If Google detected Hindi from Roman text, it's also Hinglish
+  if (!originalIsHinglish && detectedCode === 'hi' && typeof hinlang !== 'undefined') {
+    const script = hinlang.detect_script(text);
+    if (script === 'roman' || script === 'mixed') {
+      originalIsHinglish = true;
+      if (lang.code === 'hi') {
+        res.translation = hinlang.to_hindi(text);
+      }
+    }
+  }
+
+  if (originalIsHinglish) {
+    res.detectedLang = 'Hinglish';
+  }
+
+  // Filter out translations if the detected language is not in the user's interaction languages
+  if (sourceLangs.length > 0) {
+    const allowedCodes = sourceLangs.map(l => ALL_LANGS[l]?.code).filter(Boolean);
+    if (originalIsHinglish) allowedCodes.push('hi', 'hien');
+
+    const detectedCode = res.detectedCode || '';
+    const baseCode = detectedCode.split('-')[0].toLowerCase();
+    
+    const isAllowed = allowedCodes.some(c => {
+      const allowedBase = c.split('-')[0].toLowerCase();
+      return c === detectedCode || allowedBase === baseCode;
+    });
+
+    if (!isAllowed) {
+      return { skip: true };
+    }
+  }
+
+  return res;
 }
 
 async function translateGoogle(text, lang) {
@@ -78,7 +276,8 @@ async function translateGoogle(text, lang) {
   const detectedCode = data[2] || '';
   return {
     translation,
-    detectedLang: LANG_NAMES[detectedCode] || detectedCode.toUpperCase() || 'Auto',
+    detectedCode,
+    detectedLang: LANG_CODE_TO_LABEL[detectedCode] || detectedCode.toUpperCase() || 'Auto',
     targetLang: lang.label
   };
 }

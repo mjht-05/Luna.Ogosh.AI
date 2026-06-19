@@ -1,22 +1,45 @@
 /* Ogosh v1.3 — injected into WhatsApp Web */
 
 /* ── Translation panel ──────────────────────────────────────────────────────── */
+.ogosh-text {
+  display: inline-block;
+  font-size: 13px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
 .ogosh-panel {
-  padding: 6px 10px 8px;
-  background: rgba(0,168,132,0.07);
-  border-left: 2.5px solid #00a884;
-  border-radius: 0 7px 7px 0;
+  background: rgba(0, 168, 132, 0.08);
+  border-left: 3px solid #00a884;
+  border-radius: 0 6px 6px 0;
+  padding: 6px 10px;
   margin: 2px 0 4px;
   max-width: min(360px, 92vw);
+  box-sizing: border-box;
   animation: ogoshIn 0.18s ease;
 }
+
+/* Hard override for light mode text visibility */
+body:not(.dark) .ogosh-text,
+html[dir] body:not([class*="dark"]) .ogosh-text,
+#main .ogosh-text {
+  color: inherit;
+}
+html[dir] body:not([class*="dark"]) .ogosh-panel .ogosh-text,
+.light .ogosh-text,
+[data-theme="light"] .ogosh-text {
+  color: #111b21 !important;
+}
+
 .ogosh-loading { border-left-color: rgba(134,150,160,0.35); }
 .ogosh-dots { font-size: 11px; color: #8696a0; animation: ogoshPulse 1.4s ease-in-out infinite; }
 .ogosh-meta { display:flex; align-items:center; gap:4px; margin-bottom:4px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
 .ogosh-from  { color: #8696a0; }
 .ogosh-arrow { color: #8696a0; font-weight: 400; }
 .ogosh-to    { color: #00a884; }
-.ogosh-text  { font-size: 13.5px; line-height: 1.55; color: #e9edef; word-break: break-word; white-space: pre-wrap; }
 .ogosh-error { border-left-color: #f87171; }
 .ogosh-err   { font-size: 11.5px; color: #f87171; }
 
@@ -27,6 +50,7 @@
   cursor: pointer;
   font-size: 18px;
   padding: 4px 6px;
+  margin-right: 4px;
   border-radius: 50%;
   opacity: 0.55;
   transition: opacity .15s, background .15s;
@@ -136,8 +160,15 @@
 .ogosh-emoji-note { margin-top: 5px; font-size: 11px; color: #8696a0; line-height: 1.4; }
 
 /* ── Light theme ────────────────────────────────────────────────────────────── */
-[data-theme="light"] .ogosh-text  { color: #111b21; }
-[data-theme="light"] .ogosh-panel { background: rgba(0,168,132,0.05); }
+[data-theme="light"] .ogosh-text,
+html.light .ogosh-text,
+body.light .ogosh-text,
+.light .ogosh-text { color: #111b21 !important; }
+
+[data-theme="light"] .ogosh-panel,
+html.light .ogosh-panel,
+body.light .ogosh-panel,
+.light .ogosh-panel { background: rgba(0,168,132,0.08) !important; }
 
 /* ── Composer Panel ─────────────────────────────────────────────────────────── */
 .ogosh-composer {
@@ -150,6 +181,8 @@
   z-index: 1000;
   border-radius: 8px;
   margin: 0 16px 8px;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 .ogosh-composer-header {
   display: flex;
@@ -159,6 +192,7 @@
 .ogosh-composer-langs {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 .ogosh-cl-btn {
   background: rgba(255,255,255,0.08);
@@ -191,7 +225,7 @@
 .ogosh-composer-copy:hover {
   opacity: 1;
 }
-.ogosh-composer-input {
+.ogosh-composer-preview {
   width: 100%;
   background: #2a3942;
   border: 1px solid rgba(255,255,255,0.1);
@@ -199,21 +233,25 @@
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 14px;
-  resize: none;
   font-family: inherit;
-  outline: none;
   min-height: 40px;
   max-height: 120px;
-  transition: border-color .2s;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
 }
-.ogosh-composer-input:focus {
-  border-color: #00a884;
+.ogosh-composer-preview:empty::before {
+  content: 'Type in WhatsApp message box to translate...';
+  color: #8696a0;
 }
 
-[data-theme="light"] .ogosh-composer { background: #f0f2f5; border-color: rgba(0,0,0,0.1); }
-[data-theme="light"] .ogosh-composer-input { background: #ffffff; color: #111b21; border-color: rgba(0,0,0,0.1); }
-[data-theme="light"] .ogosh-cl-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #54656f; }
-[data-theme="light"] .ogosh-cl-btn.active { background: rgba(0,168,132,0.1); border-color: #00a884; color: #00a884; }
+[data-theme="light"] .ogosh-composer, .light .ogosh-composer { background: #f0f2f5; border-color: rgba(0,0,0,0.1); }
+[data-theme="light"] .ogosh-composer-preview, .light .ogosh-composer-preview { background: #ffffff; color: #111b21; border-color: rgba(0,0,0,0.1); }
+[data-theme="light"] .ogosh-cl-btn, .light .ogosh-cl-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #54656f; }
+[data-theme="light"] .ogosh-cl-btn.active, .light .ogosh-cl-btn.active { background: rgba(0,168,132,0.1); border-color: #00a884; color: #00a884; }
 
 /* ── Animations ─────────────────────────────────────────────────────────────── */
 @keyframes ogoshIn    { from { opacity:0; transform:translateY(-2px); } to { opacity:1; transform:none; } }

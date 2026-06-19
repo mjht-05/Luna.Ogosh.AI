@@ -8,27 +8,167 @@ const groqApiKeyEl = document.getElementById('groqApiKey');
 const groqEyeBtn = document.getElementById('groqEyeBtn');
 
 const targetLangGrid = document.getElementById('targetLangGrid');
-const targetLangSelect = document.getElementById('targetLangSelect');
+const targetLangInput = document.getElementById('targetLangInput');
 
-const sourceLangSelect = document.getElementById('sourceLangSelect');
+const sourceLangInput = document.getElementById('sourceLangInput');
 const sourceLangTags = document.getElementById('sourceLangTags');
 
 const ALL_LANGS = {
-  english: { label: 'English', flag: '🇬🇧' },
-  hindi: { label: 'Hindi', flag: '🇮🇳' },
-  hinglish: { label: 'Hinglish (HiEn)', flag: '🇮🇳' },
-  french: { label: 'French', flag: '🇫🇷' },
-  spanish: { label: 'Spanish', flag: '🇪🇸' },
-  portuguese: { label: 'Portuguese', flag: '🇧🇷' },
-  marathi: { label: 'Marathi', flag: '🇮🇳' },
-  tamil: { label: 'Tamil', flag: '🇮🇳' }
+  afrikaans: { label: 'Afrikaans', code: 'af' },
+  albanian: { label: 'Albanian', code: 'sq' },
+  amharic: { label: 'Amharic', code: 'am' },
+  arabic: { label: 'Arabic', code: 'ar' },
+  armenian: { label: 'Armenian', code: 'hy' },
+  assamese: { label: 'Assamese', code: 'as' },
+  aymara: { label: 'Aymara', code: 'ay' },
+  azerbaijani: { label: 'Azerbaijani', code: 'az' },
+  bambara: { label: 'Bambara', code: 'bm' },
+  basque: { label: 'Basque', code: 'eu' },
+  belarusian: { label: 'Belarusian', code: 'be' },
+  bengali: { label: 'Bengali', code: 'bn' },
+  bhojpuri: { label: 'Bhojpuri', code: 'bho' },
+  bosnian: { label: 'Bosnian', code: 'bs' },
+  bulgarian: { label: 'Bulgarian', code: 'bg' },
+  catalan: { label: 'Catalan', code: 'ca' },
+  cebuano: { label: 'Cebuano', code: 'ceb' },
+  chinese_simplified: { label: 'Chinese (Simplified)', code: 'zh-CN' },
+  chinese_traditional: { label: 'Chinese (Traditional)', code: 'zh-TW' },
+  corsican: { label: 'Corsican', code: 'co' },
+  croatian: { label: 'Croatian', code: 'hr' },
+  czech: { label: 'Czech', code: 'cs' },
+  danish: { label: 'Danish', code: 'da' },
+  dhivehi: { label: 'Dhivehi', code: 'dv' },
+  dogri: { label: 'Dogri', code: 'doi' },
+  dutch: { label: 'Dutch', code: 'nl' },
+  english: { label: 'English', code: 'en' },
+  esperanto: { label: 'Esperanto', code: 'eo' },
+  estonian: { label: 'Estonian', code: 'et' },
+  ewe: { label: 'Ewe', code: 'ee' },
+  filipino: { label: 'Filipino', code: 'tl' },
+  finnish: { label: 'Finnish', code: 'fi' },
+  french: { label: 'French', code: 'fr' },
+  frisian: { label: 'Frisian', code: 'fy' },
+  galician: { label: 'Galician', code: 'gl' },
+  georgian: { label: 'Georgian', code: 'ka' },
+  german: { label: 'German', code: 'de' },
+  greek: { label: 'Greek', code: 'el' },
+  guarani: { label: 'Guarani', code: 'gn' },
+  gujarati: { label: 'Gujarati', code: 'gu' },
+  haitian_creole: { label: 'Haitian Creole', code: 'ht' },
+  hausa: { label: 'Hausa', code: 'ha' },
+  hawaiian: { label: 'Hawaiian', code: 'haw' },
+  hebrew: { label: 'Hebrew', code: 'he' },
+  hindi: { label: 'Hindi', code: 'hi' },
+  hmong: { label: 'Hmong', code: 'hmn' },
+  hungarian: { label: 'Hungarian', code: 'hu' },
+  icelandic: { label: 'Icelandic', code: 'is' },
+  igbo: { label: 'Igbo', code: 'ig' },
+  ilocano: { label: 'Ilocano', code: 'ilo' },
+  indonesian: { label: 'Indonesian', code: 'id' },
+  irish: { label: 'Irish', code: 'ga' },
+  italian: { label: 'Italian', code: 'it' },
+  japanese: { label: 'Japanese', code: 'ja' },
+  javanese: { label: 'Javanese', code: 'jv' },
+  kannada: { label: 'Kannada', code: 'kn' },
+  kazakh: { label: 'Kazakh', code: 'kk' },
+  khmer: { label: 'Khmer', code: 'km' },
+  kinyarwanda: { label: 'Kinyarwanda', code: 'rw' },
+  konkani: { label: 'Konkani', code: 'gom' },
+  korean: { label: 'Korean', code: 'ko' },
+  krio: { label: 'Krio', code: 'kri' },
+  kurdish_kurmanji: { label: 'Kurdish (Kurmanji)', code: 'ku' },
+  kurdish_sorani: { label: 'Kurdish (Sorani)', code: 'ckb' },
+  kyrgyz: { label: 'Kyrgyz', code: 'ky' },
+  lao: { label: 'Lao', code: 'lo' },
+  latin: { label: 'Latin', code: 'la' },
+  latvian: { label: 'Latvian', code: 'lv' },
+  lingala: { label: 'Lingala', code: 'ln' },
+  lithuanian: { label: 'Lithuanian', code: 'lt' },
+  luganda: { label: 'Luganda', code: 'lg' },
+  luxembourgish: { label: 'Luxembourgish', code: 'lb' },
+  macedonian: { label: 'Macedonian', code: 'mk' },
+  maithili: { label: 'Maithili', code: 'mai' },
+  malagasy: { label: 'Malagasy', code: 'mg' },
+  malay: { label: 'Malay', code: 'ms' },
+  malayalam: { label: 'Malayalam', code: 'ml' },
+  maltese: { label: 'Maltese', code: 'mt' },
+  maori: { label: 'Maori', code: 'mi' },
+  marathi: { label: 'Marathi', code: 'mr' },
+  meiteilon_manipuri: { label: 'Meiteilon (Manipuri)', code: 'mni-Mtei' },
+  mizo: { label: 'Mizo', code: 'lus' },
+  mongolian: { label: 'Mongolian', code: 'mn' },
+  myanmar_burmese: { label: 'Myanmar (Burmese)', code: 'my' },
+  nepali: { label: 'Nepali', code: 'ne' },
+  norwegian: { label: 'Norwegian', code: 'no' },
+  nyanja_chichewa: { label: 'Nyanja (Chichewa)', code: 'ny' },
+  odia_oriya: { label: 'Odia (Oriya)', code: 'or' },
+  oromo: { label: 'Oromo', code: 'om' },
+  pashto: { label: 'Pashto', code: 'ps' },
+  persian: { label: 'Persian', code: 'fa' },
+  polish: { label: 'Polish', code: 'pl' },
+  portuguese: { label: 'Portuguese', code: 'pt' },
+  punjabi: { label: 'Punjabi', code: 'pa' },
+  quechua: { label: 'Quechua', code: 'qu' },
+  romanian: { label: 'Romanian', code: 'ro' },
+  russian: { label: 'Russian', code: 'ru' },
+  samoan: { label: 'Samoan', code: 'sm' },
+  sanskrit: { label: 'Sanskrit', code: 'sa' },
+  scots_gaelic: { label: 'Scots Gaelic', code: 'gd' },
+  sepedi: { label: 'Sepedi', code: 'nso' },
+  serbian: { label: 'Serbian', code: 'sr' },
+  sesotho: { label: 'Sesotho', code: 'st' },
+  shona: { label: 'Shona', code: 'sn' },
+  sindhi: { label: 'Sindhi', code: 'sd' },
+  sinhala: { label: 'Sinhala', code: 'si' },
+  slovak: { label: 'Slovak', code: 'sk' },
+  slovenian: { label: 'Slovenian', code: 'sl' },
+  somali: { label: 'Somali', code: 'so' },
+  spanish: { label: 'Spanish', code: 'es' },
+  sundanese: { label: 'Sundanese', code: 'su' },
+  swahili: { label: 'Swahili', code: 'sw' },
+  swedish: { label: 'Swedish', code: 'sv' },
+  tajik: { label: 'Tajik', code: 'tg' },
+  tamil: { label: 'Tamil', code: 'ta' },
+  tatar: { label: 'Tatar', code: 'tt' },
+  telugu: { label: 'Telugu', code: 'te' },
+  thai: { label: 'Thai', code: 'th' },
+  tigrinya: { label: 'Tigrinya', code: 'ti' },
+  tsonga: { label: 'Tsonga', code: 'ts' },
+  turkish: { label: 'Turkish', code: 'tr' },
+  turkmen: { label: 'Turkmen', code: 'tk' },
+  twi_akan: { label: 'Twi (Akan)', code: 'ak' },
+  ukrainian: { label: 'Ukrainian', code: 'uk' },
+  urdu: { label: 'Urdu', code: 'ur' },
+  uyghur: { label: 'Uyghur', code: 'ug' },
+  uzbek: { label: 'Uzbek', code: 'uz' },
+  vietnamese: { label: 'Vietnamese', code: 'vi' },
+  welsh: { label: 'Welsh', code: 'cy' },
+  xhosa: { label: 'Xhosa', code: 'xh' },
+  yiddish: { label: 'Yiddish', code: 'yi' },
+  yoruba: { label: 'Yoruba', code: 'yo' },
+  zulu: { label: 'Zulu', code: 'zu' },
+  hinglish: { label: 'Hinglish (HiEn)', code: 'hien' }
 };
+
+// Populate the selects dynamically
+function populateSelects() {
+  const optionsHTML = Object.keys(ALL_LANGS).map(k => `<option value="${ALL_LANGS[k].label}">`).join('');
+  
+  document.getElementById('sourceLangsData').innerHTML = optionsHTML;
+  document.getElementById('targetLangsData').innerHTML = optionsHTML;
+}
+
+function getLangKeyByLabel(label) {
+  return Object.keys(ALL_LANGS).find(k => ALL_LANGS[k].label === label);
+}
 
 let currentTargetLang = 'english';
 let top2TargetLangs = ['english', 'hindi'];
 let currentSourceLangs = [];
 
 async function init() {
+  populateSelects();
+  
   const sync = await chrome.storage.sync.get(['wa_target_lang', 'wa_target_top2', 'wa_source_langs', 'wa_gemini_key', 'wa_groq_key']);
   const local = await chrome.storage.local.get(['ogosh_tracked']);
 
@@ -57,12 +197,12 @@ function renderTargetLangs() {
     return `
       <label class="lang-opt ${isActive ? 'active' : ''}" data-lang="${lang}">
         <input type="radio" name="lang" value="${lang}" ${isActive ? 'checked' : ''}>
-        <div class="dot"></div><span class="flag">${info.flag}</span> ${info.label}
+        <div class="dot"></div><span class="flag">${info.flag || '🌍'}</span> ${info.label}
       </label>
     `;
   }).join('');
 
-  targetLangSelect.value = "";
+  targetLangInput.value = "";
 }
 
 targetLangGrid.addEventListener('click', e => {
@@ -73,14 +213,16 @@ targetLangGrid.addEventListener('click', e => {
   }
 });
 
-targetLangSelect.addEventListener('change', e => {
-  const selected = e.target.value;
-  if (selected && selected !== currentTargetLang) {
-    currentTargetLang = selected;
-    if (!top2TargetLangs.includes(selected)) {
-      top2TargetLangs = [selected, top2TargetLangs[0]];
+targetLangInput.addEventListener('change', e => {
+  const label = e.target.value;
+  const key = getLangKeyByLabel(label);
+  if (key && key !== currentTargetLang) {
+    currentTargetLang = key;
+    if (!top2TargetLangs.includes(key)) {
+      top2TargetLangs = [key, top2TargetLangs[0]];
     }
     renderTargetLangs();
+    e.target.value = '';
   }
 });
 
@@ -93,18 +235,20 @@ function renderSourceLangs() {
       </div>
     `;
   }).join('');
-  sourceLangSelect.value = "";
+  sourceLangInput.value = "";
 }
 
-sourceLangSelect.addEventListener('change', e => {
-  const selected = e.target.value;
-  if (selected && !currentSourceLangs.includes(selected)) {
+sourceLangInput.addEventListener('change', e => {
+  const label = e.target.value;
+  const key = getLangKeyByLabel(label);
+  if (key && !currentSourceLangs.includes(key)) {
     if (currentSourceLangs.length >= 5) {
       showStatus('Maximum 5 source languages allowed.', true);
     } else {
-      currentSourceLangs.push(selected);
+      currentSourceLangs.push(key);
       renderSourceLangs();
     }
+    e.target.value = '';
   }
 });
 
