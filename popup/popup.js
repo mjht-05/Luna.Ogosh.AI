@@ -1,38 +1,130 @@
-// popup.js — Ogosh v1.3
+// popup.js — Ogosh v1.4
 
 const saveBtn = document.getElementById('saveBtn');
 const statusEl = document.getElementById('status');
-const langGrid = document.getElementById('langGrid');
 const apiKeyEl = document.getElementById('apiKey');
 const eyeBtn = document.getElementById('eyeBtn');
+const groqApiKeyEl = document.getElementById('groqApiKey');
+const groqEyeBtn = document.getElementById('groqEyeBtn');
+
+const targetLangGrid = document.getElementById('targetLangGrid');
+const targetLangSelect = document.getElementById('targetLangSelect');
+
+const sourceLangSelect = document.getElementById('sourceLangSelect');
+const sourceLangTags = document.getElementById('sourceLangTags');
+
+const ALL_LANGS = {
+  english: { label: 'English', flag: '🇬🇧' },
+  hindi: { label: 'Hindi', flag: '🇮🇳' },
+  hinglish: { label: 'Hinglish (HiEn)', flag: '🇮🇳' },
+  french: { label: 'French', flag: '🇫🇷' },
+  spanish: { label: 'Spanish', flag: '🇪🇸' },
+  portuguese: { label: 'Portuguese', flag: '🇧🇷' },
+  marathi: { label: 'Marathi', flag: '🇮🇳' },
+  tamil: { label: 'Tamil', flag: '🇮🇳' }
+};
+
+let currentTargetLang = 'english';
+let top2TargetLangs = ['english', 'hindi'];
+let currentSourceLangs = [];
 
 async function init() {
-  const sync = await chrome.storage.sync.get(['wa_target_lang', 'wa_gemini_key']);
+  const sync = await chrome.storage.sync.get(['wa_target_lang', 'wa_target_top2', 'wa_source_langs', 'wa_gemini_key', 'wa_groq_key']);
   const local = await chrome.storage.local.get(['ogosh_tracked']);
 
-  setActive(sync.wa_target_lang || 'english');
+  currentTargetLang = sync.wa_target_lang || 'english';
+  if (sync.wa_target_top2 && sync.wa_target_top2.length === 2) {
+    top2TargetLangs = sync.wa_target_top2;
+  }
+  if (!top2TargetLangs.includes(currentTargetLang)) {
+    top2TargetLangs = [currentTargetLang, top2TargetLangs[0]];
+  }
+
+  currentSourceLangs = sync.wa_source_langs || [];
+
   if (sync.wa_gemini_key) apiKeyEl.value = sync.wa_gemini_key;
+  if (sync.wa_groq_key) groqApiKeyEl.value = sync.wa_groq_key;
+
+  renderTargetLangs();
+  renderSourceLangs();
   renderTracked(local.ogosh_tracked || []);
 }
 
-function setActive(lang) {
-  document.querySelectorAll('.lang-opt').forEach(o => {
-    const match = o.dataset.lang === lang;
-    o.classList.toggle('active', match);
-    o.querySelector('input').checked = match;
-  });
+function renderTargetLangs() {
+  targetLangGrid.innerHTML = top2TargetLangs.map(lang => {
+    const info = ALL_LANGS[lang] || { label: lang, flag: '🌍' };
+    const isActive = lang === currentTargetLang;
+    return `
+      <label class="lang-opt ${isActive ? 'active' : ''}" data-lang="${lang}">
+        <input type="radio" name="lang" value="${lang}" ${isActive ? 'checked' : ''}>
+        <div class="dot"></div><span class="flag">${info.flag}</span> ${info.label}
+      </label>
+    `;
+  }).join('');
+
+  targetLangSelect.value = "";
 }
 
-langGrid.addEventListener('click', e => {
+targetLangGrid.addEventListener('click', e => {
   const o = e.target.closest('.lang-opt');
-  if (o) setActive(o.dataset.lang);
+  if (o) {
+    currentTargetLang = o.dataset.lang;
+    renderTargetLangs();
+  }
 });
 
-eyeBtn.addEventListener('click', () => {
-  const show = apiKeyEl.type === 'password';
-  apiKeyEl.type = show ? 'text' : 'password';
-  eyeBtn.textContent = show ? '🙈' : '👁';
+targetLangSelect.addEventListener('change', e => {
+  const selected = e.target.value;
+  if (selected && selected !== currentTargetLang) {
+    currentTargetLang = selected;
+    if (!top2TargetLangs.includes(selected)) {
+      top2TargetLangs = [selected, top2TargetLangs[0]];
+    }
+    renderTargetLangs();
+  }
 });
+
+function renderSourceLangs() {
+  sourceLangTags.innerHTML = currentSourceLangs.map(lang => {
+    const info = ALL_LANGS[lang] || { label: lang };
+    return `
+      <div class="ogosh-tag">
+        ${info.label} <span class="ogosh-tag-remove" data-lang="${lang}">✕</span>
+      </div>
+    `;
+  }).join('');
+  sourceLangSelect.value = "";
+}
+
+sourceLangSelect.addEventListener('change', e => {
+  const selected = e.target.value;
+  if (selected && !currentSourceLangs.includes(selected)) {
+    if (currentSourceLangs.length >= 5) {
+      showStatus('Maximum 5 source languages allowed.', true);
+    } else {
+      currentSourceLangs.push(selected);
+      renderSourceLangs();
+    }
+  }
+});
+
+sourceLangTags.addEventListener('click', e => {
+  if (e.target.classList.contains('ogosh-tag-remove')) {
+    const lang = e.target.dataset.lang;
+    currentSourceLangs = currentSourceLangs.filter(l => l !== lang);
+    renderSourceLangs();
+  }
+});
+
+function setupEyeBtn(btn, input) {
+  btn.addEventListener('click', () => {
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    btn.textContent = show ? '🙈' : '👁';
+  });
+}
+setupEyeBtn(eyeBtn, apiKeyEl);
+setupEyeBtn(groqEyeBtn, groqApiKeyEl);
 
 function renderTracked(tracked) {
   const list = document.getElementById('trackedList');
@@ -69,11 +161,17 @@ function escHtml(s) {
 }
 
 saveBtn.addEventListener('click', async () => {
-  const lang = document.querySelector('.lang-opt.active')?.dataset.lang || 'english';
-  const key = apiKeyEl.value.trim();
+  const geminiKey = apiKeyEl.value.trim();
+  const groqKey = groqApiKeyEl.value.trim();
 
-  const data = { wa_target_lang: lang };
-  if (key) data.wa_gemini_key = key;
+  const data = { 
+    wa_target_lang: currentTargetLang,
+    wa_target_top2: top2TargetLangs,
+    wa_source_langs: currentSourceLangs
+  };
+  
+  data.wa_gemini_key = geminiKey || '';
+  data.wa_groq_key = groqKey || '';
 
   await chrome.storage.sync.set(data);
   showStatus('✓ Saved. Reload WhatsApp Web to apply.');

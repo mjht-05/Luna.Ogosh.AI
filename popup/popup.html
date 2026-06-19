@@ -283,6 +283,109 @@
       color: #3d4f57;
       padding-bottom: 12px
     }
+
+    /* Select Dropdowns */
+    .ogosh-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, .06);
+      border: 1.5px solid rgba(255, 255, 255, .1);
+      border-radius: 8px;
+      color: #d1d7db;
+      font-size: 13px;
+      outline: none;
+      transition: border-color .18s;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .ogosh-select:focus {
+      border-color: #00a884;
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+    
+    .select-wrapper::after {
+      content: '▼';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: #8696a0;
+      pointer-events: none;
+    }
+
+    /* Tags */
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+      min-height: 24px;
+    }
+
+    .ogosh-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      background: rgba(0, 168, 132, .15);
+      border: 1px solid rgba(0, 168, 132, .4);
+      border-radius: 6px;
+      font-size: 11px;
+      color: #00a884;
+    }
+
+    .ogosh-tag-remove {
+      cursor: pointer;
+      font-weight: bold;
+      color: #f87171;
+    }
+
+    .ogosh-tag-remove:hover {
+      color: #ef4444;
+    }
+
+    /* Tooltip */
+    .tooltip-icon {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      line-height: 14px;
+      text-align: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .1);
+      color: #aebac1;
+      font-size: 10px;
+      font-weight: bold;
+      cursor: help;
+      position: relative;
+    }
+
+    .tooltip-icon:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 6px;
+      padding: 6px 8px;
+      background: #2a3942;
+      color: #d1d7db;
+      font-size: 11px;
+      font-weight: normal;
+      white-space: normal;
+      width: 200px;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      z-index: 10;
+      text-transform: none;
+      letter-spacing: normal;
+    }
   </style>
 </head>
 
@@ -293,45 +396,64 @@
     <p>Auto-translate · Emotion Pulse · Free</p>
   </div>
 
-  <!-- Language -->
+  <!-- Source Languages -->
   <div class="section">
-    <div class="section-label">Translate messages into</div>
-    <div class="lang-grid" id="langGrid">
-      <label class="lang-opt" data-lang="english">
-        <input type="radio" name="lang" value="english">
-        <div class="dot"></div><span class="flag">🇬🇧</span> English
-      </label>
-      <label class="lang-opt" data-lang="hindi">
-        <input type="radio" name="lang" value="hindi">
-        <div class="dot"></div><span class="flag">🇮🇳</span> हिंदी &nbsp;Hindi
-      </label>
-      <label class="lang-opt" data-lang="hinglish">
-        <input type="radio" name="lang" value="hinglish">
-        <div class="dot"></div><span class="flag">🇮🇳</span> Hinglish <span
-          style="font-size:10px;color:#8696a0;margin-left:4px">AI ✦</span>
-      </label>
-      <label class="lang-opt" data-lang="french">
-        <input type="radio" name="lang" value="french">
-        <div class="dot"></div><span class="flag">🇫🇷</span> Français &nbsp;French
-      </label>
-      <label class="lang-opt" data-lang="portuguese">
-        <input type="radio" name="lang" value="portuguese">
-        <div class="dot"></div><span class="flag">🇧🇷</span> Português
-      </label>
+    <div class="section-label">
+      WhatsApp Interaction Languages
+      <span class="tooltip-icon" data-tooltip="What languages are you interacting in on WhatsApp? Select all languages that you commonly use.">ⓘ</span>
+    </div>
+    <div class="tags-container" id="sourceLangTags"></div>
+    <div class="select-wrapper">
+      <select class="ogosh-select" id="sourceLangSelect">
+        <option value="" disabled selected>Add a language... (Max 5)</option>
+        <option value="hindi">Hindi</option>
+        <option value="hinglish">Hinglish (HiEn)</option>
+        <option value="english">English</option>
+        <option value="french">French</option>
+        <option value="spanish">Spanish</option>
+        <option value="portuguese">Portuguese</option>
+        <option value="marathi">Marathi</option>
+        <option value="tamil">Tamil</option>
+      </select>
     </div>
   </div>
 
-  <!-- OpenAI key -->
+  <!-- Target Language -->
   <div class="section">
-    <div class="section-label">Gemini API Key &nbsp;<span
-        style="font-size:9px;color:#8696a0;font-weight:400;text-transform:none">Optional — for Hinglish AI + Emotion
-        Pulse</span></div>
+    <div class="section-label">Translate messages into</div>
+    <div class="lang-grid" id="targetLangGrid" style="margin-bottom: 8px;">
+      <!-- Top 2 will be populated by JS -->
+    </div>
+    <div class="select-wrapper">
+      <select class="ogosh-select" id="targetLangSelect">
+        <option value="" disabled selected>More languages...</option>
+        <option value="hindi">Hindi</option>
+        <option value="hinglish">Hinglish (HiEn)</option>
+        <option value="english">English</option>
+        <option value="french">French</option>
+        <option value="spanish">Spanish</option>
+        <option value="portuguese">Portuguese</option>
+        <option value="marathi">Marathi</option>
+        <option value="tamil">Tamil</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- API Keys -->
+  <div class="section">
+    <div class="section-label">Groq API Key <span style="font-size:9px;color:#8696a0;font-weight:400;text-transform:none">Primary for Emotion Pulse</span></div>
     <div class="key-row">
-      <input type="password" id="apiKey" autocomplete="off" spellcheck="false">
+      <input type="password" id="groqApiKey" autocomplete="off" spellcheck="false" placeholder="gsk_...">
+      <button class="eye-btn" id="groqEyeBtn">👁</button>
+    </div>
+    <p class="hint">Free fast inferences at <a href="https://console.groq.com/keys" target="_blank">console.groq.com</a></p>
+    
+    <div class="section-label" style="margin-top: 14px;">Gemini API Key <span style="font-size:9px;color:#8696a0;font-weight:400;text-transform:none">Fallback</span></div>
+    <div class="key-row">
+      <input type="password" id="apiKey" autocomplete="off" spellcheck="false" placeholder="AIza...">
       <button class="eye-btn" id="eyeBtn">👁</button>
     </div>
-    <p class="hint">Free credits at <a href="https://aistudio.google.com/app/apikey"
-        target="_blank">aistudio.google.com</a>. Uses gemini-1.5-flash — fractions of a cent per message.</p>
+    <p class="hint">Free credits at <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></p>
   </div>
 
   <!-- Tracked contacts -->

@@ -139,6 +139,82 @@
 [data-theme="light"] .ogosh-text  { color: #111b21; }
 [data-theme="light"] .ogosh-panel { background: rgba(0,168,132,0.05); }
 
+/* ── Composer Panel ─────────────────────────────────────────────────────────── */
+.ogosh-composer {
+  background: #1f2c34;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+  border-radius: 8px;
+  margin: 0 16px 8px;
+}
+.ogosh-composer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ogosh-composer-langs {
+  display: flex;
+  gap: 8px;
+}
+.ogosh-cl-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #aebac1;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+.ogosh-cl-btn:hover {
+  background: rgba(255,255,255,0.15);
+  color: #d1d7db;
+}
+.ogosh-cl-btn.active {
+  background: rgba(0,168,132,0.2);
+  border-color: #00a884;
+  color: #00a884;
+}
+.ogosh-composer-copy {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity .2s;
+}
+.ogosh-composer-copy:hover {
+  opacity: 1;
+}
+.ogosh-composer-input {
+  width: 100%;
+  background: #2a3942;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #d1d7db;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  resize: none;
+  font-family: inherit;
+  outline: none;
+  min-height: 40px;
+  max-height: 120px;
+  transition: border-color .2s;
+}
+.ogosh-composer-input:focus {
+  border-color: #00a884;
+}
+
+[data-theme="light"] .ogosh-composer { background: #f0f2f5; border-color: rgba(0,0,0,0.1); }
+[data-theme="light"] .ogosh-composer-input { background: #ffffff; color: #111b21; border-color: rgba(0,0,0,0.1); }
+[data-theme="light"] .ogosh-cl-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #54656f; }
+[data-theme="light"] .ogosh-cl-btn.active { background: rgba(0,168,132,0.1); border-color: #00a884; color: #00a884; }
+
 /* ── Animations ─────────────────────────────────────────────────────────────── */
 @keyframes ogoshIn    { from { opacity:0; transform:translateY(-2px); } to { opacity:1; transform:none; } }
 @keyframes ogoshSlide { from { opacity:0; transform:translateY(-8px) scale(.97); } to { opacity:1; transform:none; } }

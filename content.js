@@ -382,7 +382,11 @@
       currentContact = contact;
       removePanel();
       document.getElementById('ogosh-toggle')?.remove();
-      setTimeout(injectToggle, 200);
+      document.getElementById('ogosh-composer')?.remove();
+      setTimeout(() => {
+        injectToggle();
+        injectComposer();
+      }, 200);
     }
 
     // Debounced emotion re-analysis when new messages arrive
@@ -390,6 +394,76 @@
       clearTimeout(emotionTimer);
       emotionTimer = setTimeout(runEmotionAnalysis, 3000);
     }
+  }
+
+  // ═══ COMPOSER PANEL ══════════════════════════════════════════════════════════
+  
+  let activeComposerLang = null;
+
+  async function injectComposer() {
+    if (document.getElementById('ogosh-composer')) return;
+    const footer = document.querySelector('#main footer');
+    if (!footer) return;
+
+    const { wa_source_langs } = await chrome.storage.sync.get(['wa_source_langs']);
+    const langs = wa_source_langs || [];
+    if (langs.length === 0) return;
+
+    const composerPanel = document.createElement('div');
+    composerPanel.id = 'ogosh-composer';
+    composerPanel.className = 'ogosh-composer';
+    
+    const langBtns = langs.map(l => {
+      const code = l === 'hinglish' ? 'HiEn' : l === 'hindi' ? 'HI' : l === 'english' ? 'EN' : l.substring(0,2).toUpperCase();
+      return `<button class="ogosh-cl-btn" data-lang="${l}">${code}</button>`;
+    }).join('');
+
+    composerPanel.innerHTML = `
+      <div class="ogosh-composer-header">
+        <div class="ogosh-composer-langs">${langBtns}</div>
+        <button class="ogosh-composer-copy" title="Copy to clipboard">📋</button>
+      </div>
+      <textarea class="ogosh-composer-input" placeholder="Type here (select language above)..." rows="1"></textarea>
+    `;
+
+    footer.parentElement.insertBefore(composerPanel, footer);
+
+    const inputArea = composerPanel.querySelector('.ogosh-composer-input');
+    const copyBtn = composerPanel.querySelector('.ogosh-composer-copy');
+    const langContainer = composerPanel.querySelector('.ogosh-composer-langs');
+
+    langContainer.addEventListener('click', e => {
+      if (e.target.tagName === 'BUTTON') {
+        composerPanel.querySelectorAll('.ogosh-cl-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        activeComposerLang = e.target.dataset.lang;
+        inputArea.focus();
+      }
+    });
+
+    inputArea.addEventListener('input', function(e) {
+      if (activeComposerLang === 'hinglish' && window.hinlang) {
+         if (e.data === ' ' || e.inputType === 'insertLineBreak' || e.inputType === 'insertText') {
+             // Simple hack: convert on space to prevent cursor jumping mid-word
+             if (this.value.endsWith(' ')) {
+                 this.value = window.hinlang.to_hindi(this.value);
+             }
+         }
+      }
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    });
+
+    copyBtn.addEventListener('click', () => {
+      let finalVal = inputArea.value;
+      if (activeComposerLang === 'hinglish' && window.hinlang) {
+          finalVal = window.hinlang.to_hindi(finalVal);
+          inputArea.value = finalVal;
+      }
+      navigator.clipboard.writeText(finalVal).then(() => {
+        showToast('Copied to clipboard!');
+      });
+    });
   }
 
   function waitFor(sel, t = 20000) {

@@ -7,12 +7,13 @@
   "host_permissions": [
     "https://web.whatsapp.com/*",
     "https://translate.googleapis.com/*",
-    "https://generativelanguage.googleapis.com/*"
+    "https://generativelanguage.googleapis.com/*",
+    "https://api.groq.com/*"
   ],
   "background": { "service_worker": "background.js" },
   "content_scripts": [{
     "matches": ["https://web.whatsapp.com/*"],
-    "js": ["content.js"],
+    "js": ["hinlang.js", "content.js"],
     "css": ["styles.css"],
     "run_at": "document_idle"
   }],

@@ -1,101 +1,86 @@
-# LinguaWA — WhatsApp Web Translator
+# Ogosh — WhatsApp Web AI Translator & Emotion Pulse
 
-Translate WhatsApp Web messages into Hindi, Hinglish, Casual Hinglish (with slang), French, and Casual French — directly inside the chat. Powered by Claude Haiku via the Anthropic API.
-
----
-
-## What it does
-
-A small "🌐 Translate" button appears below each message in WhatsApp Web. Click it and the message is translated into your chosen language in about a second. Click "🔼 Hide" to collapse it again. Works on both sent and received messages.
-
-**Supported output languages:**
-- English
-- Hindi (हिंदी, Devanagari script)
-- Hinglish (Roman script, natural mix)
-- Casual Hinglish with real slang (yaar, bhai, khatarnak, ekdum, etc.)
-- French (standard)
-- Casual French with youth slang (ouf, chelou, wesh, carrément, etc.)
-
-Auto-detects the source language — no need to tell it whether the message is in French, Hindi, or Hinglish.
+Ogosh is a powerful Chrome extension for WhatsApp Web that provides seamless translation, live Hinglish transliteration, and AI-powered emotional analysis of your chats.
 
 ---
 
-## Install in Chrome (or any Chromium browser)
+## Features
 
-1. Download and unzip `whatsapp-translator.zip`
-2. Open Chrome and go to `chrome://extensions`
-3. Enable **Developer mode** (toggle in the top-right corner)
-4. Click **Load unpacked**
-5. Select the `whatsapp-translator` folder (the one containing `manifest.json`)
-6. The LinguaWA icon (🌐) will appear in your toolbar
+### 1. Auto-Translation
+- Translates incoming WhatsApp messages into your preferred target language.
+- Automatically handles **Hinglish (HiEn)** messages by intelligently transliterating them to Hindi before passing them to the translation engine, ensuring highly accurate context preservation.
+- Uses Google Translate under the hood (completely free, no API keys needed for translation).
+
+### 2. Composer Panel
+- A sleek, injected panel right above your WhatsApp typing area.
+- Select your source language toggle buttons.
+- Features live **Hinglish -> Hindi** transliteration as you type.
+- Click the 📋 button to instantly copy the text to your clipboard, ready to paste into the WhatsApp chat box.
+
+### 3. Emotion Pulse 🧠
+- Track the emotional state of specific contacts (up to 3 contacts).
+- Analyzes recent message history, tone, slang, and emoji frequency.
+- Built with a robust AI fallback chain: **Groq (Llama-3.3-70b-versatile)** as the primary engine for lightning-fast inferences, seamlessly falling back to **Google Gemini** if rate limits are hit.
+- Data stays on your device; only required context is securely sent to the AI providers using your own API keys.
 
 ---
 
-## Setup
+## Installation
 
-1. Get a free Anthropic API key at [console.anthropic.com/keys](https://console.anthropic.com/keys)
-2. Click the 🌐 LinguaWA icon in your Chrome toolbar
-3. Paste your API key
-4. Choose your preferred target language
-5. Click **Save Settings**
-6. Open (or reload) [web.whatsapp.com](https://web.whatsapp.com)
+1. Download and unzip the repository.
+2. Open Chrome (or any Chromium browser) and go to `chrome://extensions`.
+3. Enable **Developer mode** (toggle in the top-right corner).
+4. Click **Load unpacked** and select the folder containing `manifest.json`.
+5. The Ogosh icon will appear in your toolbar.
 
 ---
 
-## Cost
+## Setup & Configuration
 
-Uses `claude-haiku-4-5` — the fastest and cheapest Claude model.
-A typical WhatsApp message translation costs less than $0.0001.
-You'd need to translate tens of thousands of messages to spend a dollar.
+1. Click the Ogosh icon in your Chrome toolbar to open the settings.
+2. **API Keys:**
+   - Add your [Groq API Key](https://console.groq.com/keys) (Primary for Emotion Pulse).
+   - Add your [Gemini API Key](https://aistudio.google.com/app/apikey) (Fallback for Emotion Pulse).
+3. **Source Languages:** Select up to 5 languages you commonly interact in (e.g., English, Hindi, Hinglish). This helps the extension identify languages accurately.
+4. **Target Language:** Select your preferred language for incoming translations. The top 2 most-used languages are pinned as quick-select radio buttons.
+5. Click **Save** and reload WhatsApp Web.
 
 ---
 
 ## Usage
 
-- Open any chat on WhatsApp Web
-- Each message will have a **🌐 Translate** button below it
-- Click it → translation appears with a "detected → target" language badge
-- Click **🔼 Hide** to collapse it
-- Click again to show it (no extra API call — it's cached)
-- Change your target language anytime via the extension popup
+**Translating Incoming Messages:**
+- Messages will be automatically processed. If the detected language differs from your target language, a translation panel will appear inline.
+
+**Composing Messages:**
+- Use the Composer Panel above the chat input box.
+- Select `HiEn` (Hinglish), type naturally in Roman script, and watch it seamlessly convert to Hindi as you type.
+- Hit the 📋 copy button to transfer the text to WhatsApp.
+
+**Emotion Pulse:**
+- Click the 🧠 icon in the WhatsApp header for a tracked contact.
+- View real-time emotional insights and primary/secondary emotion intensities based on recent chat history.
 
 ---
 
-## Known limitations
+## Known Limitations & Privacy
 
-**Desktop only.** There's no way to inject UI into the native WhatsApp iOS or Android app. This only works in a browser.
-
-**Both users don't need the extension.** Only the person reading the message needs LinguaWA installed. Your friend in France doesn't need to do anything.
-
-**WhatsApp may update their DOM.** WhatsApp Web occasionally changes its internal HTML structure. If buttons stop appearing, the selectors in `content.js` may need updating. The key selector to check is `span.selectable-text.copyable-text` — if WhatsApp renames these classes, update line ~90 in `content.js`.
-
-**Messages loaded before the extension.** On first load there's a ~1.2 second delay before buttons appear on already-visible messages. New messages get buttons immediately.
-
-**End-to-end encryption.** When you click translate, the message text is sent from your browser to the Anthropic API. It leaves the E2E encrypted environment at that point. This is the same tradeoff as using Google Translate on any text — use your judgment on sensitive conversations.
-
-**WhatsApp ToS.** This extension modifies the WhatsApp Web interface without Meta's endorsement. It won't get you banned (it's a read-only enhancement — no message sending, no automation), but it's technically outside their Terms of Service. Use at your own discretion.
+- **Desktop Only:** Only works on WhatsApp Web via a Chromium-based browser.
+- **API Keys:** Emotion Pulse requires your own Groq and/or Gemini API keys. Keys are securely stored in your local browser extension storage.
+- **WhatsApp Web Updates:** If WhatsApp changes its DOM structure, the Composer Panel or inline translations might need selector updates in `content.js`.
 
 ---
 
-## Files
+## Architecture / Files
 
 ```
-whatsapp-translator/
-├── manifest.json      Extension config (Manifest V3)
-├── background.js      Service worker — handles Anthropic API calls
-├── content.js         Injected into WhatsApp Web — adds translate buttons
-├── styles.css         Button and result box styles
+├── manifest.json      Extension configuration (Manifest V3).
+├── background.js      Service worker: handles translation requests and Emotion Pulse AI calls.
+├── content.js         Injected into WhatsApp Web: manages the DOM, Composer Panel, and Emotion UI.
+├── hinlang.js         Standalone library for fast, offline Hinglish to Hindi transliteration.
+├── styles.css         Dark/Light theme aware CSS for panels and modals.
 ├── popup/
-│   ├── popup.html     Settings UI
-│   └── popup.js       Settings logic (chrome.storage read/write)
-└── icons/
-    ├── icon16.png
-    ├── icon48.png
-    └── icon128.png
+│   ├── popup.html     Settings UI (API keys, language selection).
+│   └── popup.js       Settings logic and storage management.
+└── icons/             Extension branding icons.
 ```
-
----
-
-## Customising slang
-
-The translation prompts are in `background.js` under the `LANG_CONFIG` object. Each language has a `prompt` string with examples and slang word lists. You can edit these freely to tune the style — add regional slang, change the tone, etc.

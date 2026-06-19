@@ -1,20 +1,38 @@
-// background.js — Ogosh v1.4
-// Google Translate (free) for all languages.
-// Google Gemini 1.5 Flash (free tier, no card) for Hinglish + Emotion Pulse.
+// background.js — Ogosh v1.5
+// Google Translate for ALL languages.
+// Groq (primary) / Gemini (fallback) ONLY for Emotion Pulse.
+
+importScripts('hinlang.js');
 
 const LANG_CONFIG = {
-  english:    { label: 'English',   code: 'en',      ai: false },
-  hindi:      { label: 'Hindi',     code: 'hi',      ai: false },
-  hinglish:   { label: 'Hinglish',  code: 'hi-Latn', ai: true  },
-  french:     { label: 'French',    code: 'fr',      ai: false },
-  portuguese: { label: 'Português', code: 'pt',      ai: false }
+  english:    { label: 'English',   code: 'en' },
+  hindi:      { label: 'Hindi',     code: 'hi' },
+  hinglish:   { label: 'Hinglish',  code: 'hi-Latn' },
+  french:     { label: 'French',    code: 'fr' },
+  spanish:    { label: 'Spanish',   code: 'es' },
+  portuguese: { label: 'Português', code: 'pt' },
+  marathi:    { label: 'Marathi',   code: 'mr' },
+  tamil:      { label: 'Tamil',     code: 'ta' }
 };
 
 const LANG_NAMES = {
   en: 'English', hi: 'Hindi', fr: 'French', de: 'German',
   es: 'Spanish', it: 'Italian', pt: 'Portuguese', ar: 'Arabic',
-  zh: 'Chinese', ja: 'Japanese', ko: 'Korean', ru: 'Russian'
+  zh: 'Chinese', ja: 'Japanese', ko: 'Korean', ru: 'Russian',
+  mr: 'Marathi', ta: 'Tamil'
 };
+
+// ── Hinglish source detection ─────────────────────────────────────────────────
+// These words are distinctly Hindi in Latin script and won't appear in plain English/French/etc.
+const HINGLISH_PATTERN = /\b(yaar|bhai|kya|nahi|nahin|toh|phir|abhi|bahut|bohot|mast|bindaas|arrey|oye|kadak|ekdum|mujhe|acha|accha|achcha|theek|sahi|iska|uska|woh|lekin|matlab|hoga|chal|bol|hain|karo|dekho|suno)\b/i;
+
+function isLikelyHinglish(text) {
+  // Skip text containing Devanagari, Arabic, CJK, Japanese, Korean — those aren't Hinglish
+  if (/[\u0900-\u097F\u0600-\u06FF\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF]/.test(text)) return false;
+  return HINGLISH_PATTERN.test(text);
+}
+
+// ── Message listener ──────────────────────────────────────────────────────────
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'TRANSLATE') {
@@ -31,12 +49,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // ── Translation ───────────────────────────────────────────────────────────────
 
 async function translate(text) {
-  const stored = await chrome.storage.sync.get(['wa_target_lang', 'wa_gemini_key']);
+  const stored = await chrome.storage.sync.get(['wa_target_lang', 'wa_source_langs']);
   const targetLang = stored.wa_target_lang || 'english';
-  const apiKey = stored.wa_gemini_key?.trim();
+  const sourceLangs = stored.wa_source_langs || [];
   const lang = LANG_CONFIG[targetLang] || LANG_CONFIG.english;
 
-  if (lang.ai && apiKey) return translateHinglishAI(text, apiKey);
+  // Convert Hinglish to Hindi before translation using hinlang.js
+  if (sourceLangs.includes('hinglish') && isLikelyHinglish(text) && typeof hinlang !== 'undefined') {
+    text = hinlang.to_hindi(text);
+  }
+
   return translateGoogle(text, lang);
 }
 
@@ -61,36 +83,13 @@ async function translateGoogle(text, lang) {
   };
 }
 
-async function translateHinglishAI(text, apiKey) {
-  const result = await callGemini(apiKey,
-    `You are a Hinglish translator. Convert the given text to natural Hinglish — the way young urban Indians actually text each other.
-Rules:
-- Roman script only, no Devanagari
-- Natural Hindi-English mix using real slang: yaar, bhai, bro, kya scene hai, bindaas, mast, ekdum, kadak, solid, full on, timepass, sahi hai, ek number, arrey, oye, bas yaar, khatarnak, chill maar
-- Match the energy and tone of the original exactly
-- Return ONLY the Hinglish translation, nothing else`,
-    text
-  );
-  return {
-    translation: result,
-    detectedLang: guessLang(text),
-    targetLang: 'Hinglish'
-  };
-}
-
-function guessLang(text) {
-  if (/[\u0900-\u097F]/.test(text)) return 'Hindi';
-  if (/[àâçèéêëîïôùûü]/i.test(text)) return 'French';
-  if (/[ãõáéíóúàâêô]/i.test(text)) return 'Portuguese';
-  return 'English';
-}
-
 // ── Emotion analysis ──────────────────────────────────────────────────────────
 
 async function analyzeEmotion(contactName, messages, patterns) {
-  const stored = await chrome.storage.sync.get(['wa_gemini_key']);
-  const apiKey = stored.wa_gemini_key?.trim();
-  if (!apiKey) throw new Error('Add your Gemini API key in Ogosh settings.');
+  const stored = await chrome.storage.sync.get(['wa_gemini_key', 'wa_groq_key']);
+  const groqKey = stored.wa_groq_key?.trim();
+  const geminiKey = stored.wa_gemini_key?.trim();
+  if (!groqKey && !geminiKey) throw new Error('Add your Groq or Gemini API key in Ogosh settings.');
 
   const topEmojis = Object.entries(patterns?.emojiFreq || {})
     .sort((a, b) => b[1] - a[1]).slice(0, 10)
@@ -99,34 +98,97 @@ async function analyzeEmotion(contactName, messages, patterns) {
   const msgBlock = messages.slice(-20)
     .map(m => `${m.sender}: ${m.text}`).join('\n');
 
-  const result = await callGemini(apiKey,
-    `You are an emotion analyst specialising in WhatsApp and digital communication patterns.
-Analyse the emotional state of "${contactName}" from their recent messages.
+  const systemPrompt = `You are an emotion analyst for WhatsApp conversations.
+Analyse the emotional state of the contact named "${contactName}" from their recent messages.
+Use ONLY these emotion tags: Amazed, Amused, Angry, Annoyed, Anxious, Ashamed, Brave, Calm, Content, Disappointed, Discouraged, Disgusted, Drained, Embarrassed, Excited, Frustrated, Grateful, Grieving, Happy, Hopeful, Hopeless, Irritated, Jealous, Joyful, Lonely, Nervous, Overwhelmed, Peaceful, Pleased, Proud, Relieved, Resentful, Sad, Scared, Stressed, Surprised, Thankful, Tired, Uncomfortable, Worried
+Consider: word choice, punctuation energy (!!!, ...), emoji patterns, message length, slang.
+Output ONLY the following JSON object, no markdown, no explanation, no preamble:
+{"primary":{"emotion":"EmotionName","intensity":4},"secondary":{"emotion":"EmotionName","intensity":3},"tertiary":{"emotion":"EmotionName","intensity":2},"insight":"one sentence about their current emotional state","emojiPattern":"brief emoji note or empty string"}`;
+  
+  const userMessage = `Contact: ${contactName}\n${topEmojis ? `Emoji history: ${topEmojis}\n` : ''}Recent messages:\n${msgBlock}`;
 
-Use Apple Health emotion tags only:
-Amazed, Amused, Angry, Annoyed, Anxious, Ashamed, Brave, Calm, Content, Disappointed,
-Discouraged, Disgusted, Drained, Embarrassed, Excited, Frustrated, Grateful, Grieving,
-Happy, Hopeful, Hopeless, Irritated, Jealous, Joyful, Lonely, Nervous, Overwhelmed,
-Peaceful, Pleased, Proud, Relieved, Resentful, Sad, Scared, Stressed, Surprised,
-Thankful, Tired, Uncomfortable, Worried
+  let result = null;
+  let lastErr = null;
 
-Consider: word choice, punctuation energy (!!!  vs ...), emoji patterns, message length, slang.
+  if (groqKey) {
+    try {
+      result = await callGroq(groqKey, systemPrompt, userMessage, true);
+    } catch (err) {
+      console.warn('Groq failed, falling back...', err);
+      lastErr = err;
+    }
+  }
 
-Return ONLY valid JSON, no markdown:
-{"primary":{"emotion":"EmotionName","intensity":4},"secondary":{"emotion":"EmotionName","intensity":3},"tertiary":{"emotion":"EmotionName","intensity":2},"insight":"one sentence about their current emotional state","emojiPattern":"brief emoji note or empty string"}`,
-    `Contact: ${contactName}
-${topEmojis ? `Emoji history: ${topEmojis}` : ''}
-Recent messages:
-${msgBlock}`
-  );
+  if (!result && geminiKey) {
+    try {
+      result = await callGemini(geminiKey, systemPrompt, userMessage, true);
+    } catch (err) {
+      console.warn('Gemini failed...', err);
+      lastErr = err;
+    }
+  }
 
-  return JSON.parse(result.replace(/^```json?\s*|\s*```$/g, '').trim());
+  if (!result) throw lastErr || new Error('Emotion analysis failed (all providers down or limit reached).');
+
+  return parseEmotionJSON(result);
 }
 
-// ── Gemini helper ─────────────────────────────────────────────────────────────
+// Robust JSON extractor
+function parseEmotionJSON(text) {
+  let s = text.replace(/^```json?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+  try { return JSON.parse(s); } catch {}
+  const match = s.match(/\{[\s\S]*\}/);
+  if (match) {
+    try { return JSON.parse(match[0]); } catch {}
+  }
+  throw new Error('Emotion analysis returned an unexpected format — please try again.');
+}
 
-async function callGemini(apiKey, systemPrompt, userMessage) {
+// ── AI Helpers ─────────────────────────────────────────────────────────────
+
+async function callGroq(apiKey, systemPrompt, userMessage, jsonMode = false) {
+  const url = 'https://api.groq.com/openai/v1/chat/completions';
+  const body = {
+    model: 'llama-3.3-70b-versatile',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userMessage }
+    ]
+  };
+  
+  if (jsonMode) {
+    body.response_format = { type: 'json_object' };
+  }
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    if (res.status === 401) throw new Error('Invalid Groq API key.');
+    if (res.status === 429) throw new Error('Groq rate limit hit.');
+    throw new Error(err.error?.message || `Groq error ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content?.trim() || '';
+}
+
+async function callGemini(apiKey, systemPrompt, userMessage, jsonMode = false) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+
+  const generationConfig = {
+    maxOutputTokens: 800,
+    thinkingConfig: { thinkingBudget: 0 }
+  };
+
+  if (jsonMode) generationConfig.responseMimeType = 'application/json';
 
   const res = await fetch(url, {
     method: 'POST',
@@ -134,17 +196,22 @@ async function callGemini(apiKey, systemPrompt, userMessage) {
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: systemPrompt }] },
       contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-      generationConfig: { maxOutputTokens: 600 }
+      generationConfig
     })
   });
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    if (res.status === 400) throw new Error('Invalid Gemini API key. Check Ogosh settings.');
-    if (res.status === 429) throw new Error('Gemini rate limit hit. Wait a moment.');
+    if (res.status === 400) throw new Error('Invalid Gemini API key.');
+    if (res.status === 429) throw new Error('Gemini rate limit hit.');
     throw new Error(err.error?.message || `Gemini error ${res.status}`);
   }
 
   const data = await res.json();
+
+  if (data.candidates?.[0]?.finishReason === 'MAX_TOKENS') {
+    throw new Error('Response was truncated.');
+  }
+
   return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 }
