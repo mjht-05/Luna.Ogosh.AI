@@ -219,7 +219,12 @@ async function translate(text) {
     }
   }
 
-  const res = await translateGoogle(text, lang);
+  let fetchLang = lang;
+  if (targetLang === 'hinglish') {
+    fetchLang = ALL_LANGS.hindi;
+  }
+
+  const res = await translateGoogle(text, fetchLang);
   if (res.error) return res;
 
   const detectedCode = res.detectedCode || '';
@@ -229,10 +234,16 @@ async function translate(text) {
     const script = hinlang.detect_script(text);
     if (script === 'roman' || script === 'mixed') {
       originalIsHinglish = true;
-      if (lang.code === 'hi') {
+      if (fetchLang.code === 'hi') {
         res.translation = hinlang.to_hindi(text);
       }
     }
+  }
+
+  // Convert the output to Hinglish if target is Hinglish
+  if (targetLang === 'hinglish' && typeof hinlang !== 'undefined') {
+     res.translation = hinlang.to_roman(res.translation);
+     res.targetLang = lang.label; // reset label back to Hinglish
   }
 
   if (originalIsHinglish) {
